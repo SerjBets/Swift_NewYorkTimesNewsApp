@@ -1,0 +1,25 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "DZNEmptyDataSet",
+        "repositoryURL": "https://github.com/dzenbot/DZNEmptyDataSet",
+        "state": {
+          "branch": "master",
+          "revision": "9bffa69a83a9fa58a14b3cf43cb6dd8a63774179",
+          "version": null
+        }
+      },
+      {
+        "package": "SDWebImage",
+        "repositoryURL": "https://github.com/SDWebImage/SDWebImage.git",
+        "state": {
+          "branch": null,
+          "revision": "2e63d0061da449ad0ed130768d05dceb1496de44",
+          "version": "5.12.5"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
