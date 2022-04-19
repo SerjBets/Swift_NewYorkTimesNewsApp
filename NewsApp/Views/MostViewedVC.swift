@@ -5,13 +5,14 @@
 
 import UIKit
 import DZNEmptyDataSet
+import SDWebImage
 
 class MostViewedVC: UIViewController,UITableViewDelegate, UITableViewDataSource {
     @IBOutlet weak var mostViewedTableView: UITableView!
     
     private enum Constants {
         enum Identifiers {
-            static let cell = "mostViewedCell"
+            static let cell = "NewsCustomCell"
             static let segue = "viewedSegue"
             static let viewedTitle = "Most Viewed News"
         }
@@ -28,6 +29,7 @@ class MostViewedVC: UIViewController,UITableViewDelegate, UITableViewDataSource 
         navigationItem.title = Constants.Identifiers.viewedTitle
         self.mostViewedTableView.emptyDataSetSource = self;
         self.mostViewedTableView.emptyDataSetDelegate = self
+        self.registerTableViewCells()
         mostViewedTableView.tableFooterView = UIView()
         
         NewsService.shared.fetchNews(for: .mostViewed) { results in
@@ -63,12 +65,16 @@ extension MostViewedVC {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = mostViewedTableView.dequeueReusableCell(withIdentifier: Constants.Identifiers.cell,
-                                                            for: indexPath)
+                                                            for: indexPath) as! NewsTableViewCell
         let news = viewedNewsList[indexPath.section][indexPath.row]
-        cell.textLabel?.numberOfLines = 0
-        cell.textLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
-        tableView.rowHeight = UITableView.automaticDimension
-        cell.textLabel?.text = news.title
+        mostViewedTableView.rowHeight = UITableView.automaticDimension
+        cell.newsTitle.numberOfLines = 0
+        cell.newsTitle.lineBreakMode = NSLineBreakMode.byWordWrapping
+        cell.newsTitle.text = news.title
+        cell.byLine.text = news.byline
+        let imageUrl = NewsService.shared.getImageUrl(newsItem: news, imageheight: NewsService.ImageHeight.small.rawValue)
+        cell.newsImage.sd_imageIndicator = SDWebImageActivityIndicator.gray
+        cell.newsImage.sd_setImage(with: imageUrl, placeholderImage: UIImage(named: "no image.php"))
         return cell
     }
     
@@ -78,6 +84,11 @@ extension MostViewedVC {
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         return viewedNewsList[section].compactMap { $0.section }.first ?? "Unknown"
+    }
+    
+    private func registerTableViewCells() {
+        let newsTitleCell = UINib(nibName: Constants.Identifiers.cell, bundle: nil)
+        self.mostViewedTableView.register(newsTitleCell, forCellReuseIdentifier: Constants.Identifiers.cell)
     }
     
 }

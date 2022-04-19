@@ -1,21 +1,26 @@
 //
 //  NewsTableViewCell.swift
 //  NewsApp
-//  Created by Serhii Bets on 13.04.2022.
-//  Copyright by Serhii Bets. All rights reserved.
+//
+//  Created by Сергей Бец on 19.04.2022.
+//
 
-//import UIKit
-//
-//class NewsTableViewCell: UITableViewCell {
-//
-//    static let reuseIdentifier = "savedTableViewCell"
-//    
-//    override func awakeFromNib() {
-//        super.awakeFromNib()
-//    }
-//
-//    override func setSelected(_ selected: Bool, animated: Bool) {
-//        super.setSelected(selected, animated: animated)
-//    }
-//
-//}
+import UIKit
+
+class NewsTableViewCell: UITableViewCell {
+
+    @IBOutlet weak var newsImage: UIImageView!
+    @IBOutlet weak var newsTitle: UILabel!
+    @IBOutlet weak var byLine: UILabel!
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+    }
+
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+    }
+    
+    
+
+}

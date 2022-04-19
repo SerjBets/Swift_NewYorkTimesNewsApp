@@ -59,11 +59,6 @@ class DetailNewsVC: UIViewController, SFSafariViewControllerDelegate {
         }
     }
     
-    func getImageUrl() -> URL? {
-        let imageUrl = news?.media.first?.metadata.first(where: {$0.height == 293})
-        return imageUrl?.url
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         CoreDataManager.shared.fetchingNewsFromCoreData { result in
@@ -85,7 +80,7 @@ class DetailNewsVC: UIViewController, SFSafariViewControllerDelegate {
         newsText.text = news?.abstract
         newsUrl.titleLabel?.text = news?.url
         
-        guard let imageUrl = getImageUrl() else { return }
+        guard let imageUrl = NewsService.shared.getImageUrl(newsItem: news, imageheight: NewsService.ImageHeight.large.rawValue) else { return }
         imageView.sd_imageIndicator = SDWebImageActivityIndicator.gray
         imageView.sd_setImage(with: imageUrl)
     }

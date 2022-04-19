@@ -6,6 +6,7 @@
 import Foundation
 import Alamofire
 import UIKit
+import SwiftUI
 
 class NewsService {
     
@@ -13,6 +14,12 @@ class NewsService {
         case mostEmailed = "emailed"
         case mostShared  = "shared"
         case mostViewed  = "viewed"
+    }
+    
+    enum ImageHeight: Int {
+        case small = 75
+        case medium = 140
+        case large = 293
     }
     
     static let shared = NewsService()
@@ -35,5 +42,10 @@ class NewsService {
                 print("error: ", error)
             }
         }
+    }
+    
+    func getImageUrl(newsItem: News, imageheight: Int) -> URL? {
+        let imageUrl = newsItem.media.first?.metadata.first(where: {$0.height == imageheight})
+        return imageUrl?.url
     }
 }

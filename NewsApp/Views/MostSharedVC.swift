@@ -5,13 +5,14 @@
 
 import UIKit
 import DZNEmptyDataSet
+import SDWebImage
 
 class MostSharedVC: UIViewController, UITableViewDelegate, UITableViewDataSource  {
     @IBOutlet weak var mostSharedTableView: UITableView!
     
     private enum Constants {
         enum Identifiers {
-            static let cell = "mostSharedCell"
+            static let cell = "NewsCustomCell"
             static let segue = "sharedSegue"
             static let sharedTitle = "Most Shared News"
         }
@@ -28,6 +29,7 @@ class MostSharedVC: UIViewController, UITableViewDelegate, UITableViewDataSource
         navigationItem.title = Constants.Identifiers.sharedTitle
         self.mostSharedTableView.emptyDataSetSource = self;
         self.mostSharedTableView.emptyDataSetDelegate = self
+        self.registerTableViewCells()
         mostSharedTableView.tableFooterView = UIView()
         
         NewsService.shared.fetchNews(for: .mostShared) { results in
@@ -47,6 +49,10 @@ class MostSharedVC: UIViewController, UITableViewDelegate, UITableViewDataSource
         detailedVC.news = news
     }
 
+    private func registerTableViewCells() {
+        let newsTitleCell = UINib(nibName: Constants.Identifiers.cell, bundle: nil)
+        self.mostSharedTableView.register(newsTitleCell, forCellReuseIdentifier: Constants.Identifiers.cell)
+    }
 }
 
 // === MARK: - TableView Delegate / DataSource extension ===
@@ -63,12 +69,16 @@ extension MostSharedVC {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = mostSharedTableView.dequeueReusableCell(withIdentifier: Constants.Identifiers.cell,
-                                                            for: indexPath)
+                                                            for: indexPath) as! NewsTableViewCell
         let news = sharedNewsList[indexPath.section][indexPath.row]
-        cell.textLabel?.numberOfLines = 0
-        cell.textLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
-        tableView.rowHeight = UITableView.automaticDimension
-        cell.textLabel?.text = news.title
+        mostSharedTableView.rowHeight = UITableView.automaticDimension
+        cell.newsTitle.numberOfLines = 0
+        cell.newsTitle.lineBreakMode = NSLineBreakMode.byWordWrapping
+        cell.newsTitle.text = news.title
+        cell.byLine.text = news.byline
+        let imageUrl = NewsService.shared.getImageUrl(newsItem: news, imageheight: NewsService.ImageHeight.small.rawValue)
+        cell.newsImage.sd_imageIndicator = SDWebImageActivityIndicator.gray
+        cell.newsImage.sd_setImage(with: imageUrl, placeholderImage: UIImage(named: "no image.php"))
         return cell
     }
     

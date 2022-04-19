@@ -6,13 +6,14 @@
 import UIKit
 import Alamofire
 import DZNEmptyDataSet
+import SDWebImage
 
 class MostEmailedVC: UIViewController, UITableViewDelegate, UITableViewDataSource  {
     @IBOutlet weak var mostEmailedTableView: UITableView!
     
     private enum Constants {
         enum Identifiers {
-            static let cell = "mostEmailedCell"
+            static let cell = "NewsCustomCell"
             static let segue = "emailedSegue"
             static let emailedTitle = "Most Emailed News"
         }
@@ -30,6 +31,7 @@ class MostEmailedVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         self.mostEmailedTableView.emptyDataSetSource = self;
         self.mostEmailedTableView.emptyDataSetDelegate = self
         mostEmailedTableView.tableFooterView = UIView()
+        self.registerTableViewCells()
         
         NewsService.shared.fetchNews(for: .mostEmailed) { results in
             switch results {
@@ -47,13 +49,14 @@ class MostEmailedVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
                 let detailedVC = segue.destination as? DetailNewsVC else { return }
         detailedVC.news = news
     }
+
 }
 
 // === MARK: - TableView Delegate / DataSource extension ===
 extension MostEmailedVC {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let news = emailedNewsList[indexPath.section][indexPath.row]
-        performSegue(withIdentifier: Constants.Identifiers.segue, sender: news)
+        let newsItem = emailedNewsList[indexPath.section][indexPath.row]
+        performSegue(withIdentifier: Constants.Identifiers.segue, sender: newsItem)
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
@@ -63,12 +66,16 @@ extension MostEmailedVC {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = mostEmailedTableView.dequeueReusableCell(withIdentifier: Constants.Identifiers.cell,
-                                                            for: indexPath)
+                                                            for: indexPath) as! NewsTableViewCell
         let news = emailedNewsList[indexPath.section][indexPath.row]
-        cell.textLabel?.numberOfLines = 0
-        cell.textLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
-        tableView.rowHeight = UITableView.automaticDimension
-        cell.textLabel?.text = news.title
+        mostEmailedTableView.rowHeight = UITableView.automaticDimension
+        cell.newsTitle.numberOfLines = 0
+        cell.newsTitle.lineBreakMode = NSLineBreakMode.byWordWrapping
+        cell.newsTitle.text = news.title
+        cell.byLine.text = news.byline
+        let imageUrl = NewsService.shared.getImageUrl(newsItem: news, imageheight: NewsService.ImageHeight.small.rawValue)
+        cell.newsImage.sd_imageIndicator = SDWebImageActivityIndicator.gray
+        cell.newsImage.sd_setImage(with: imageUrl, placeholderImage: UIImage(named: "no image.php"))
         return cell
     }
     
@@ -78,6 +85,11 @@ extension MostEmailedVC {
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         return emailedNewsList[section].compactMap { $0.section }.first ?? "Unknown"
+    }
+    
+    private func registerTableViewCells() {
+        let newsTitleCell = UINib(nibName: Constants.Identifiers.cell, bundle: nil)
+        self.mostEmailedTableView.register(newsTitleCell, forCellReuseIdentifier: Constants.Identifiers.cell)
     }
 }
 
